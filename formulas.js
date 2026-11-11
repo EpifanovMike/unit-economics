@@ -13,17 +13,18 @@ window.calculateModel = function(v) {
   const rent = v.area * v.rent_price;
   const ebitda = pbfc - v.admin_cost - rent;
 
-  let taxes = 0;
+  const vatRate = v.vat_rate || 0;
+  const vat = (rev > 0 && vatRate > 0) ? Math.max(0, (rev - cogs - var_costs) * (vatRate / (100 + vatRate))) : 0;
+
+  let profit_tax = 0;
   if (v.tax_mode === 'usn6') {
-    taxes = rev > 0 ? rev * (v.tax_rate / 100) : 0;
-  } else if (v.tax_mode === 'usn15') {
-    taxes = ebitda > 0 ? ebitda * (v.tax_rate / 100) : 0;
-  } else if (v.tax_mode === 'osn') {
-    const vat = rev > 0 ? Math.max(0, (rev - cogs - var_costs) * (22 / 122)) : 0;
+    profit_tax = rev > 0 ? rev * (v.tax_rate / 100) : 0;
+  } else if (v.tax_mode === 'usn15' || v.tax_mode === 'osn') {
     const profitBase = ebitda - vat;
-    const profitTax = profitBase > 0 ? profitBase * (v.tax_rate / 100) : 0;
-    taxes = vat + profitTax;
+    profit_tax = profitBase > 0 ? profitBase * (v.tax_rate / 100) : 0;
   }
+
+  const taxes = vat + profit_tax;
   const net = ebitda - taxes;
 
   const cpa = v.ua > 0 ? v.ac / v.ua : 0;
@@ -40,8 +41,9 @@ window.calculateModel = function(v) {
   const gm_pct = rev > 0 ? (gm / rev) * 100 : 0;
   const ebitda_pct = rev > 0 ? (ebitda / rev) * 100 : 0;
   const ros = rev > 0 ? (net / rev) * 100 : 0;
-  const effRevTax = v.tax_mode === 'usn6' ? (v.tax_rate / 100) : (v.tax_mode === 'osn' ? (22 / 122) : 0);
-  const unit_net_margin = arppu - (v.mat_price * v.apc) - (v.avp * v.apc * effRevTax);
+  const effVat = vatRate > 0 ? (vatRate / (100 + vatRate)) : 0;
+  const effRevTax = v.tax_mode === 'usn6' ? (v.tax_rate / 100) : 0;
+  const unit_net_margin = arppu - (v.mat_price * v.apc) - (v.avp * v.apc * (effRevTax + effVat));
   const total_fixed = v.admin_cost + rent + v.ac + v.sc;
   const bep_reachable = unit_net_margin > 0;
   const bep_b = bep_reachable ? Math.ceil(total_fixed / unit_net_margin) : 0;
@@ -51,7 +53,7 @@ window.calculateModel = function(v) {
 
   return {
     b, arppu, ltv, arpu,
-    rev, cogs, gm, cm, var_costs, pbfc, rent, ebitda, taxes, net,
+    rev, cogs, gm, cm, var_costs, pbfc, rent, ebitda, vat, taxes, net,
     cpa, cac, ltv_cac, romi, roi, drr, payback, is_unprofitable,
     gm_pct, ebitda_pct, ros, bep_reachable, bep_b, bep_rev, safety_rub, safety
   };
