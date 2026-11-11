@@ -107,12 +107,13 @@ function renderStructureBar(r) {
 
   barEl.innerHTML = segments.map(s => {
     const pct = (Math.max(0, s.val) / total) * 100;
-    return `<div class="bar-seg" style="width:${pct}%;background:${s.color}" title="${s.name}: ${fmtCur(s.val)} (${fmtPct(pct)})">${pct >= 7 ? Math.round(pct) + '%' : ''}</div>`;
+    const label = pct >= 7 ? Math.round(pct) + '%' : '';
+    return '<div class="bar-seg" style="width:' + pct + '%;background:' + s.color + '" title="' + s.name + ': ' + fmtCur(s.val) + ' (' + fmtPct(pct) + ')">' + label + '</div>';
   }).join('');
 
   legEl.innerHTML = segments.map(s => {
     const pct = (Math.max(0, s.val) / total) * 100;
-    return `<span class="leg-item"><span class="leg-dot" style="background:${s.color}"></span>${s.name}: <b>${fmtPct(pct)}</b></span>`;
+    return '<span class="leg-item"><span class="leg-dot" style="background:' + s.color + '"></span>' + s.name + ': <b>' + fmtPct(pct) + '</b></span>';
   }).join('');
 }
 
@@ -135,12 +136,7 @@ function renderComparison(resA, resB) {
     const isGood = higherIsBetter ? diff > 0 : diff < 0;
     const isBad = higherIsBetter ? diff < 0 : diff > 0;
     const cls = diff === 0 ? '' : (isGood ? 'positive-text' : (isBad ? 'negative-text' : ''));
-    return `<tr>
-      <td>${name}</td>
-      <td>${fmt(valA)}</td>
-      <td>${fmt(valB)}</td>
-      <td class="${cls}" style="font-weight:600">${fmtDiff(diff, fmt)}</td>
-    </tr>`;
+    return '<tr><td>' + name + '</td><td>' + fmt(valA) + '</td><td>' + fmt(valB) + '</td><td class="' + cls + '" style="font-weight:600">' + fmtDiff(diff, fmt) + '</td></tr>';
   }).join('');
 
   const barMetrics = [
@@ -153,11 +149,11 @@ function renderComparison(resA, resB) {
     const maxVal = Math.max(a, b, 1);
     const pctA = (a / maxVal) * 100;
     const pctB = (b / maxVal) * 100;
-    return `<div class="cbar-group">
-      <div class="cbar-title">${title}</div>
-      <div class="cbar-row"><span class="cbar-label">План А</span><div class="cbar-track"><div class="cbar-fill plan-a" style="width:${pctA}%"></div></div><span class="cbar-val">${fmtCur(a)}</span></div>
-      <div class="cbar-row"><span class="cbar-label">План Б</span><div class="cbar-track"><div class="cbar-fill plan-b" style="width:${pctB}%"></div></div><span class="cbar-val">${fmtCur(b)}</span></div>
-    </div>`;
+    return '<div class="cbar-group">' +
+      '<div class="cbar-title">' + title + '</div>' +
+      '<div class="cbar-row"><span class="cbar-label">План А</span><div class="cbar-track"><div class="cbar-fill plan-a" style="width:' + pctA + '%"></div></div><span class="cbar-val">' + fmtCur(a) + '</span></div>' +
+      '<div class="cbar-row"><span class="cbar-label">План Б</span><div class="cbar-track"><div class="cbar-fill plan-b" style="width:' + pctB + '%"></div></div><span class="cbar-val">' + fmtCur(b) + '</span></div>' +
+      '</div>';
   }).join('');
 }
 
@@ -180,7 +176,7 @@ function updateUI() {
 
   const taxSelect = document.getElementById('tax_mode');
   const taxText = taxSelect.options[taxSelect.selectedIndex]?.text || '';
-  setTxt('print_plan_label', `Сценарий: План ${activePlan} | Режим: ${taxText}`);
+  setTxt('print_plan_label', 'Сценарий: План ' + activePlan + ' | Режим: ' + taxText);
 
   setTxt('kpi_net', fmtCur(r.net));
   setTxt('kpi_ros', fmtPct(r.ros));
@@ -213,8 +209,8 @@ function updateUI() {
   setTxt('out_cac', fmtCur(r.cac));
   setTxt('out_ltv_cac', fmtNum(r.ltv_cac));
   setTxt('out_romi', fmtPct(r.romi));
-  setTxt('out_roi', fmtPct(r.roi));
-  setTxt('out_drr', fmtPct(r.drr));
+setTxt('out_roi', fmtPct(r.roi));
+setTxt('out_drr', fmtPct(r.drr));
 setTxt('out_payback', fmtNum(r.payback));
 document.getElementById('alert_box').style.display = r.is_unprofitable ? 'block' : 'none';
 setTxt('out_gm_pct', fmtPct(r.gm_pct));
@@ -274,25 +270,35 @@ const paramRows = [
 ['Налоговый режим', plansData.A.tax_mode, plansData.B.tax_mode],
 ...NUM_IDS.map(id => [id.toUpperCase(), plansData.A[id], plansData.B[id]])
 ];
-const O = '\x3C';
-const makeSheet = (name, rows) => {
+const LT = String.fromCharCode(60);
+const GT = String.fromCharCode(62);
+function makeSheet(name, rows) {
 const xmlRows = rows.map((r, idx) => {
 const cells = r.map(v => {
 const isNum = typeof v === 'number' && !isNaN(v);
 const type = isNum ? 'Number' : 'String';
 const style = idx === 0 ? ' ss:StyleID="hdr"' : '';
-return ${O}Cell${style}>${O}Data ss:Type="${type}">${v}${O}/Data>${O}/Cell>;
+return LT + 'Cell' + style + GT + LT + 'Data ss:Type="' + type + '"' + GT + v + LT + '/Data' + GT + LT + '/Cell' + GT;
 }).join('');
-return ${O}Row>${cells}${O}/Row>;
+return LT + 'Row' + GT + cells + LT + '/Row' + GT;
 }).join('');
-return ${O}Worksheet ss:Name="${name}">${O}Table>${O}Column ss:Width="220"/>${O}Column ss:Width="110"/>${O}Column ss:Width="110"/>${O}Column ss:Width="110"/>${xmlRows}${O}/Table>${O}/Worksheet>;
-};
-const xml = ${O}?xml version="1.0"?>${O}?mso-application progid="Excel.Sheet"?> +
-${O}Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"> +
-${O}Styles>${O}Style ss:ID="hdr">${O}Font ss:Bold="1"/>${O}Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/>${O}/Style>${O}/Styles> +
+return LT + 'Worksheet ss:Name="' + name + '"' + GT +
+LT + 'Table' + GT +
+LT + 'Column ss:Width="220"/' + GT +
+LT + 'Column ss:Width="110"/' + GT +
+LT + 'Column ss:Width="110"/' + GT +
+LT + 'Column ss:Width="110"/' + GT +
+xmlRows +
+LT + '/Table' + GT +
+LT + '/Worksheet' + GT;
+}
+const xml = LT + '?xml version="1.0"?' + GT +
+LT + '?mso-application progid="Excel.Sheet"?' + GT +
+LT + 'Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"' + GT +
+LT + 'Styles' + GT + LT + 'Style ss:ID="hdr"' + GT + LT + 'Font ss:Bold="1"/' + GT + LT + 'Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/' + GT + LT + '/Style' + GT + LT + '/Styles' + GT +
 makeSheet('Сравнение Планов А и Б', compRows) +
 makeSheet('Исходные данные', paramRows) +
-${O}/Workbook>;
+LT + '/Workbook' + GT;
 const blob = new Blob(['\uFEFF' + xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
 const a = document.createElement('a');
 a.href = URL.createObjectURL(blob);
