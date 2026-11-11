@@ -178,7 +178,8 @@ function updateUI() {
   const resB = window.calculateModel(plansData.B);
   const r = activePlan === 'A' ? resA : resB;
 
-  const taxText = document.getElementById('tax_mode').selectedOptions[0]?.text || '';
+  const taxSelect = document.getElementById('tax_mode');
+  const taxText = taxSelect.options[taxSelect.selectedIndex]?.text || '';
   setTxt('print_plan_label', `Сценарий: План ${activePlan} | Режим: ${taxText}`);
 
   setTxt('kpi_net', fmtCur(r.net));
@@ -239,14 +240,8 @@ document.getElementById(id).value = data[id] !== undefined ? data[id] : 0;
 updateUI();
 }
 function exportToExcel() {
-if (typeof XLSX === 'undefined') {
-alert('Библиотека Excel еще загружается, попробуйте через пару секунд.');
-return;
-}
 const resA = window.calculateModel(plansData.A);
 const resB = window.calculateModel(plansData.B);
-const wb = XLSX.utils.book_new();
-// Лист 1: Сравнение Планов А и Б
 const compRows = [
 ['Показатель', 'План А', 'План Б', 'Разница (Б - А)'],
 ['Привлеченные юзеры (UA)', plansData.A.ua, plansData.B.ua, plansData.B.ua - plansData.A.ua],
@@ -270,23 +265,33 @@ const compRows = [
 ['CAC (₽)', +resA.cac.toFixed(2), +resB.cac.toFixed(2), +(resB.cac - resA.cac).toFixed(2)],
 ['LTV (₽)', +resA.ltv.toFixed(2), +resB.ltv.toFixed(2), +(resB.ltv - resA.ltv).toFixed(2)],
 ['LTV / CAC', +resA.ltv_cac.toFixed(2), +resB.ltv_cac.toFixed(2), +(resB.ltv_cac - resA.ltv_cac).toFixed(2)],
-['Точка безубыточности (покупателей)', resA.bep_b, resB.bep_b, resB.bep_b - resA.bep_b],
+['Точка безубыточности (чел.)', resA.bep_b, resB.bep_b, resB.bep_b - resA.bep_b],
 ['Безубыточная выручка (₽)', resA.bep_rev, resB.bep_rev, resB.bep_rev - resA.bep_rev],
 ['Запас прочности (%)', +resA.safety.toFixed(2), +resB.safety.toFixed(2), +(resB.safety - resA.safety).toFixed(2)]
 ];
-const ws1 = XLSX.utils.aoa_to_sheet(compRows);
-ws1['!cols'] = [{ wch: 36 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
-XLSX.utils.book_append_sheet(wb, ws1, 'Сравнение Планов А и Б');
-// Лист 2: Вводные параметры
 const paramRows = [
 ['Параметр', 'План А', 'План Б'],
 ['Налоговый режим', plansData.A.tax_mode, plansData.B.tax_mode],
 ...NUM_IDS.map(id => [id.toUpperCase(), plansData.A[id], plansData.B[id]])
 ];
-const ws2 = XLSX.utils.aoa_to_sheet(paramRows);
-ws2['!cols'] = [{ wch: 24 }, { wch: 16 }, { wch: 16 }];
-XLSX.utils.book_append_sheet(wb, ws2, 'Исходные данные');
-XLSX.writeFile(wb, 'Unit_Economics_Model.xlsx');
+const makeSheet = (name, rows) => {
+const xmlRows = rows.map((r, idx) => {
+const cells = r.map(v => {
+const isNum = typeof v === 'number' && !isNaN(v);
+const type = isNum ? 'Number' : 'String';
+const style = idx === 0 ? ' ss:StyleID="hdr"' : '';
+return <Cell${style}><Data ss:Type="${type}">${v}</Data></Cell>;
+}).join('');
+return <Row>${cells}</Row>;
+}).join('');
+return <Worksheet ss:Name="${name}"><Table><Column ss:Width="220"/><Column ss:Width="110"/><Column ss:Width="110"/><Column ss:Width="110"/>${xmlRows}</Table></Worksheet>;
+};
+const xml = <?xml version="1.0"?><?mso-application progid="Excel.Sheet"?> <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"> <Styles><Style ss:ID="hdr"><Font ss:Bold="1"/><Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/></Style></Styles> ${makeSheet('Сравнение Планов А и Б', compRows)} ${makeSheet('Исходные данные', paramRows)} </Workbook>;
+const blob = new Blob(['\uFEFF' + xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+const a = document.createElement('a');
+a.href = URL.createObjectURL(blob);
+a.download = 'Unit_Economics_Model.xls';
+a.click();
 }
 document.addEventListener('DOMContentLoaded', () => {
 initTooltips();
