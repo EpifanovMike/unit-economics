@@ -34,7 +34,7 @@
 
     <section class="kpi-strip">
       <div class="kpi-card">
-        <span class="kpi-title">Чистая прибыль</span>
+        <span class="kpi-title">Чистая прибыль / Net Profit</span>
         <span class="kpi-val" id="kpi_net">0 ₽</span>
       </div>
       <div class="kpi-card">
@@ -53,7 +53,7 @@
 
     <section class="card structure-card">
       <div class="structure-header">
-        <h2>Структура выручки (Куда уходит каждый рубль)</h2>
+        <h2>Структура распределения выручки</h2>
         <div class="structure-legend" id="structure_legend"></div>
       </div>
       <div class="stacked-bar" id="stacked_bar"></div>
@@ -62,70 +62,72 @@
     <main class="grid">
       <div class="col">
         <div class="card">
-          <h2>1. Юнит-экономика и трафик</h2>
-          <div class="row"><label for="ua">Привлеченные юзеры, чел.</label><input type="number" id="ua" min="0"></div>
-          <div class="row"><label for="c1">Конверсия в покупку, %</label><input type="number" id="c1" min="0" max="100" step="0.1"></div>
-          <div class="row"><label for="avp">Средний чек, ₽</label><input type="number" id="avp" min="0" step="10"></div>
-          <div class="row"><label for="cogs_m">Себестоимость, %</label><input type="number" id="cogs_m" min="0" max="100" step="0.1"></div>
-          <div class="row"><label for="apc">Покупок за период, шт.</label><input type="number" id="apc" min="0" step="0.1"></div>
-          <div class="row"><label for="lifetime">Время жизни клиента, мес.</label><input type="number" id="lifetime" min="1" step="1"></div>
+          <h2>1. Юнит-экономика и трафик / Unit Economics</h2>
+          <div class="row"><label for="ua">Привлеченные пользователи / UA, чел.</label><input type="number" id="ua" min="0"></div>
+          <div class="row"><label for="c1">Конверсия в покупку / C1, %</label><input type="number" id="c1" min="0" max="100" step="0.1"></div>
+          <div class="row"><label for="avp">Средний чек / AVP, ₽</label><input type="number" id="avp" min="0" step="10"></div>
+          <div class="row"><label for="cogs_m">Доля себестоимости / COGS, %</label><input type="number" id="cogs_m" min="0" max="100" step="0.1"></div>
+          <div class="row"><label for="apc">Покупок на клиента / APC, шт.</label><input type="number" id="apc" min="0" step="0.1"></div>
+          <div class="row"><label for="lifetime">Время жизни клиента / Lifetime, мес.</label><input type="number" id="lifetime" min="1" step="1"></div>
           <hr>
-          <div class="row"><span class="lbl">Покупатели, чел.</span><span class="val" id="out_b">0</span></div>
-          <div class="row"><span class="lbl">Прибыль с платящего / ARPPU</span><span class="val" id="out_arppu">0 ₽</span></div>
+          <div class="row"><span class="lbl">Покупатели / Buyers (B), чел.</span><span class="val" id="out_b">0</span></div>
+          <div class="row"><span class="lbl">Прибыль на платящего / ARPPU</span><span class="val" id="out_arppu">0 ₽</span></div>
           <div class="row"><span class="lbl">Пожизненная ценность / LTV</span><span class="val" id="out_ltv">0 ₽</span></div>
-          <div class="row"><span class="lbl">Прибыль с юзера / ARPU</span><span class="val" id="out_arpu">0 ₽</span></div>
+          <div class="row"><span class="lbl">Прибыль на пользователя / ARPU</span><span class="val" id="out_arpu">0 ₽</span></div>
         </div>
 
         <div class="card">
-          <h2>2. Операционные допущения</h2>
-          <div class="row"><label for="area">Площадь аренды, м²</label><input type="number" id="area" min="0"></div>
-          <div class="row"><label for="rent_price">Ставка аренды за м², ₽</label><input type="number" id="rent_price" min="0" step="50"></div>
-          <div class="row"><label for="mat_price">Расходники на 1 покупку, ₽</label><input type="number" id="mat_price" min="0"></div>
+          <h2>2. Операционные допущения / Operational Assumptions</h2>
+          <div class="row"><label for="area">Площадь аренды / Area, м²</label><input type="number" id="area" min="0"></div>
+          <div class="row"><label for="rent_price">Ставка аренды за м² / Rent Rate, ₽</label><input type="number" id="rent_price" min="0" step="50"></div>
+          <div class="row"><label for="mat_price">Расходные материалы на 1 покупку / Materials, ₽</label><input type="number" id="mat_price" min="0"></div>
         </div>
       </div>
 
       <div class="col">
         <div class="card">
-          <h2>3. Отчет о прибылях и убытках (P&L)</h2>
+          <h2>3. Отчет о прибылях и убытках / P&amp;L</h2>
           <div class="row"><span class="lbl">Выручка / Revenue</span><span class="val" id="out_rev">0 ₽</span></div>
           <div class="row"><span class="lbl">Себестоимость / COGS</span><span class="val" id="out_cogs">0 ₽</span></div>
-          <div class="row highlight"><span class="lbl">Валовая прибыль (Gross Margin)</span><span class="val" id="out_gm">0 ₽</span></div>
+          <div class="row highlight"><span class="lbl">Валовая прибыль / Gross Margin</span><span class="val" id="out_gm">0 ₽</span></div>
           <div class="row"><label for="ac">Расходы на маркетинг / AC, ₽</label><input type="number" id="ac" min="0" step="100"></div>
           <div class="row"><label for="sc">Коммерческие расходы / SC, ₽</label><input type="number" id="sc" min="0" step="100"></div>
-          <div class="row highlight"><span class="lbl">Маржинальная прибыль (CM)</span><span class="val" id="out_cm">0 ₽</span></div>
-          <div class="row"><span class="lbl">Переменные расходы / Материалы</span><span class="val" id="out_var">0 ₽</span></div>
-          <div class="row highlight"><span class="lbl">Прибыль до пост. расходов</span><span class="val" id="out_pbfc">0 ₽</span></div>
-          <div class="row"><label for="admin_cost">Админ. персонал, ₽</label><input type="number" id="admin_cost" min="0" step="500"></div>
-          <div class="row"><span class="lbl">Аренда помещения</span><span class="val" id="out_rent">0 ₽</span></div>
-          <div class="row"><span class="lbl">Операционная прибыль (EBITDA)</span><span class="val" id="out_ebitda">0 ₽</span></div>
-          <div class="row"><label for="tax_rate">Ставка налога, %</label><input type="number" id="tax_rate" min="0" max="100" step="0.5"></div>
-          <div class="row"><span class="lbl">Налоги</span><span class="val" id="out_taxes">0 ₽</span></div>
-          <div class="row highlight total"><span class="lbl">ЧИСТАЯ ПРИБЫЛЬ</span><span class="val" id="out_net">0 ₽</span></div>
+          <div class="row highlight"><span class="lbl">Маржинальная прибыль / CM</span><span class="val" id="out_cm">0 ₽</span></div>
+          <div class="row"><span class="lbl">Переменные расходы / Variable Costs</span><span class="val" id="out_var">0 ₽</span></div>
+          <div class="row highlight"><span class="lbl">Прибыль до постоянных расходов / PBFC</span><span class="val" id="out_pbfc">0 ₽</span></div>
+          <div class="row"><label for="admin_cost">Административный персонал / Admin OPEX, ₽</label><input type="number" id="admin_cost" min="0" step="500"></div>
+          <div class="row"><span class="lbl">Аренда помещения / Rent OPEX</span><span class="val" id="out_rent">0 ₽</span></div>
+          <div class="row"><span class="lbl">Операционная прибыль / EBITDA</span><span class="val" id="out_ebitda">0 ₽</span></div>
+          <div class="row"><label for="vat_rate">Ставка НДС / VAT Rate, %</label><input type="number" id="vat_rate" min="0" max="100" step="1"></div>
+          <div class="row"><span class="lbl">НДС к уплате / VAT Payable</span><span class="val" id="out_vat">0 ₽</span></div>
+          <div class="row"><label for="tax_rate">Ставка налога / Tax Rate, %</label><input type="number" id="tax_rate" min="0" max="100" step="0.5"></div>
+          <div class="row"><span class="lbl">Налоги (итого) / Total Taxes</span><span class="val" id="out_taxes">0 ₽</span></div>
+          <div class="row highlight total"><span class="lbl">ЧИСТАЯ ПРИБЫЛЬ / Net Profit</span><span class="val" id="out_net">0 ₽</span></div>
         </div>
       </div>
 
       <div class="col">
         <div class="card">
-          <h2>4. Эффективность маркетинга и ROI</h2>
+          <h2>4. Эффективность маркетинга и ROI / Marketing KPIs</h2>
           <div class="row"><span class="lbl">Стоимость лида / CPA</span><span class="val" id="out_cpa">0 ₽</span></div>
           <div class="row"><span class="lbl">Стоимость покупателя / CAC</span><span class="val" id="out_cac">0 ₽</span></div>
           <div class="row"><span class="lbl">Соотношение LTV / CAC</span><span class="val" id="out_ltv_cac">0</span></div>
           <div class="row"><span class="lbl">Окупаемость рекламы / ROMI</span><span class="val" id="out_romi">0 %</span></div>
           <div class="row"><span class="lbl">Полная окупаемость / ROI</span><span class="val" id="out_roi">0 %</span></div>
-          <div class="row"><span class="lbl">Доля рекламных расходов / ДРР</span><span class="val" id="out_drr">0 %</span></div>
-          <div class="row"><span class="lbl">Окупаемость клиента, покупок</span><span class="val" id="out_payback">0</span></div>
+          <div class="row"><span class="lbl">Доля рекламных расходов / DRR</span><span class="val" id="out_drr">0 %</span></div>
+          <div class="row"><span class="lbl">Окупаемость клиента / Payback, покупок</span><span class="val" id="out_payback">0</span></div>
           <div class="alert" id="alert_box">⚠️ Внимание: привлечение клиентов не окупается (LTV &lt; CAC или ARPU &lt; CPA).</div>
         </div>
 
         <div class="card">
-          <h2>5. Рентабельность и Безубыточность</h2>
-          <div class="row"><span class="lbl">Валовая рентабельность</span><span class="val" id="out_gm_pct">0 %</span></div>
-          <div class="row"><span class="lbl">Рентабельность по EBITDA</span><span class="val" id="out_ebitda_pct">0 %</span></div>
+          <h2>5. Рентабельность и безубыточность / Profitability &amp; BEP</h2>
+          <div class="row"><span class="lbl">Валовая рентабельность / Gross Margin %</span><span class="val" id="out_gm_pct">0 %</span></div>
+          <div class="row"><span class="lbl">Рентабельность по EBITDA / EBITDA Margin</span><span class="val" id="out_ebitda_pct">0 %</span></div>
           <div class="row"><span class="lbl">Чистая рентабельность / ROS</span><span class="val" id="out_ros">0 %</span></div>
-          <div class="row"><span class="lbl">Точка безубыточности, покупателей</span><span class="val" id="out_bep_b">0</span></div>
-          <div class="row"><span class="lbl">Безубыточная выручка</span><span class="val" id="out_bep_rev">0 ₽</span></div>
-          <div class="row"><span class="lbl">Запас прочности, ₽</span><span class="val" id="out_safety_rub">0 ₽</span></div>
-          <div class="row"><span class="lbl">Запас прочности, %</span><span class="val" id="out_safety">0 %</span></div>
+          <div class="row"><span class="lbl">Точка безубыточности / BEP, покупателей</span><span class="val" id="out_bep_b">0</span></div>
+          <div class="row"><span class="lbl">Безубыточная выручка / BEP Revenue</span><span class="val" id="out_bep_rev">0 ₽</span></div>
+          <div class="row"><span class="lbl">Запас прочности / Safety Margin, ₽</span><span class="val" id="out_safety_rub">0 ₽</span></div>
+          <div class="row"><span class="lbl">Запас прочности / Safety Margin, %</span><span class="val" id="out_safety">0 %</span></div>
         </div>
       </div>
     </main>
