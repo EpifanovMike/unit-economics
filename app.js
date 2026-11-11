@@ -323,8 +323,12 @@ function exportToExcel() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initTooltips();
-  const saved = JSON.parse(localStorage.getItem('fin_model_plans_v2') || 'null');
-  if (saved && saved.A && saved.B) plansData = saved;
+  try {
+    const saved = JSON.parse(localStorage.getItem('fin_model_plans_v2') || 'null');
+    if (saved && saved.A && saved.B) plansData = saved;
+  } catch (e) {
+    localStorage.removeItem('fin_model_plans_v2');
+  }
   loadPlanToForm('A');
 
   NUM_IDS.forEach(id => document.getElementById(id).addEventListener('input', updateUI));
