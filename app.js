@@ -215,7 +215,7 @@ function updateUI() {
   setTxt('out_romi', fmtPct(r.romi));
   setTxt('out_roi', fmtPct(r.roi));
   setTxt('out_drr', fmtPct(r.drr));
-  setTxt('out_payback', fmtNum(r.payback));
+setTxt('out_payback', fmtNum(r.payback));
 document.getElementById('alert_box').style.display = r.is_unprofitable ? 'block' : 'none';
 setTxt('out_gm_pct', fmtPct(r.gm_pct));
 setTxt('out_ebitda_pct', fmtPct(r.ebitda_pct));
@@ -274,19 +274,25 @@ const paramRows = [
 ['Налоговый режим', plansData.A.tax_mode, plansData.B.tax_mode],
 ...NUM_IDS.map(id => [id.toUpperCase(), plansData.A[id], plansData.B[id]])
 ];
+const O = '\x3C';
 const makeSheet = (name, rows) => {
 const xmlRows = rows.map((r, idx) => {
 const cells = r.map(v => {
 const isNum = typeof v === 'number' && !isNaN(v);
 const type = isNum ? 'Number' : 'String';
 const style = idx === 0 ? ' ss:StyleID="hdr"' : '';
-return <Cell${style}><Data ss:Type="${type}">${v}</Data></Cell>;
+return ${O}Cell${style}>${O}Data ss:Type="${type}">${v}${O}/Data>${O}/Cell>;
 }).join('');
-return <Row>${cells}</Row>;
+return ${O}Row>${cells}${O}/Row>;
 }).join('');
-return <Worksheet ss:Name="${name}"><Table><Column ss:Width="220"/><Column ss:Width="110"/><Column ss:Width="110"/><Column ss:Width="110"/>${xmlRows}</Table></Worksheet>;
+return ${O}Worksheet ss:Name="${name}">${O}Table>${O}Column ss:Width="220"/>${O}Column ss:Width="110"/>${O}Column ss:Width="110"/>${O}Column ss:Width="110"/>${xmlRows}${O}/Table>${O}/Worksheet>;
 };
-const xml = <?xml version="1.0"?><?mso-application progid="Excel.Sheet"?> <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"> <Styles><Style ss:ID="hdr"><Font ss:Bold="1"/><Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/></Style></Styles> ${makeSheet('Сравнение Планов А и Б', compRows)} ${makeSheet('Исходные данные', paramRows)} </Workbook>;
+const xml = ${O}?xml version="1.0"?>${O}?mso-application progid="Excel.Sheet"?> +
+${O}Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"> +
+${O}Styles>${O}Style ss:ID="hdr">${O}Font ss:Bold="1"/>${O}Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/>${O}/Style>${O}/Styles> +
+makeSheet('Сравнение Планов А и Б', compRows) +
+makeSheet('Исходные данные', paramRows) +
+${O}/Workbook>;
 const blob = new Blob(['\uFEFF' + xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
 const a = document.createElement('a');
 a.href = URL.createObjectURL(blob);
