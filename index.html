@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Финансовая модель и Unit-экономика</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://sheetjs.com"></script>
 </head>
 <body>
   <div class="container">
@@ -25,7 +26,7 @@
         </select>
         <button id="btn-demo">Демо-данные</button>
         <button id="btn-clear">Очистить</button>
-        <button id="btn-export">CSV</button>
+        <button id="btn-xlsx" class="success">Excel (.xlsx)</button>
         <button id="btn-pdf" class="primary">Печать / PDF</button>
       </div>
       <div class="print-badge" id="print_plan_label">Сценарий: План А (Базовый) | Режим: УСН 6%</div>
@@ -45,9 +46,17 @@
         <span class="kpi-val" id="kpi_ltv_cac">0</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-title">ROMI</span>
-        <span class="kpi-val" id="kpi_romi">0 %</span>
+        <span class="kpi-title">Общий ROI бизнеса</span>
+        <span class="kpi-val" id="kpi_roi">0 %</span>
       </div>
+    </section>
+
+    <section class="card structure-card">
+      <div class="structure-header">
+        <h2>Структура выручки (Куда уходит каждый рубль)</h2>
+        <div class="structure-legend" id="structure_legend"></div>
+      </div>
+      <div class="stacked-bar" id="stacked_bar"></div>
     </section>
 
     <main class="grid">
@@ -87,8 +96,9 @@
           <div class="row"><span class="lbl">Переменные расходы / Материалы</span><span class="val" id="out_var">0 ₽</span></div>
           <div class="row highlight"><span class="lbl">Прибыль до пост. расходов</span><span class="val" id="out_pbfc">0 ₽</span></div>
           <div class="row"><label for="admin_cost">Админ. персонал, ₽</label><input type="number" id="admin_cost" min="0" step="500"></div>
-          <div class="row"><label for="tax_rate">Ставка налога, %</label><input type="number" id="tax_rate" min="0" max="100" step="0.5"></div>
           <div class="row"><span class="lbl">Аренда помещения</span><span class="val" id="out_rent">0 ₽</span></div>
+          <div class="row"><span class="lbl">Операционная прибыль (EBITDA)</span><span class="val" id="out_ebitda">0 ₽</span></div>
+          <div class="row"><label for="tax_rate">Ставка налога, %</label><input type="number" id="tax_rate" min="0" max="100" step="0.5"></div>
           <div class="row"><span class="lbl">Налоги</span><span class="val" id="out_taxes">0 ₽</span></div>
           <div class="row highlight total"><span class="lbl">ЧИСТАЯ ПРИБЫЛЬ</span><span class="val" id="out_net">0 ₽</span></div>
         </div>
@@ -96,11 +106,12 @@
 
       <div class="col">
         <div class="card">
-          <h2>4. Эффективность маркетинга</h2>
+          <h2>4. Эффективность маркетинга и ROI</h2>
           <div class="row"><span class="lbl">Стоимость лида / CPA</span><span class="val" id="out_cpa">0 ₽</span></div>
           <div class="row"><span class="lbl">Стоимость покупателя / CAC</span><span class="val" id="out_cac">0 ₽</span></div>
           <div class="row"><span class="lbl">Соотношение LTV / CAC</span><span class="val" id="out_ltv_cac">0</span></div>
           <div class="row"><span class="lbl">Окупаемость рекламы / ROMI</span><span class="val" id="out_romi">0 %</span></div>
+          <div class="row"><span class="lbl">Полная окупаемость / ROI</span><span class="val" id="out_roi">0 %</span></div>
           <div class="row"><span class="lbl">Доля рекламных расходов / ДРР</span><span class="val" id="out_drr">0 %</span></div>
           <div class="row"><span class="lbl">Окупаемость клиента, покупок</span><span class="val" id="out_payback">0</span></div>
           <div class="alert" id="alert_box">⚠️ Внимание: привлечение клиентов не окупается (LTV &lt; CAC или ARPU &lt; CPA).</div>
@@ -109,27 +120,32 @@
         <div class="card">
           <h2>5. Рентабельность и Безубыточность</h2>
           <div class="row"><span class="lbl">Валовая рентабельность</span><span class="val" id="out_gm_pct">0 %</span></div>
+          <div class="row"><span class="lbl">Рентабельность по EBITDA</span><span class="val" id="out_ebitda_pct">0 %</span></div>
           <div class="row"><span class="lbl">Чистая рентабельность / ROS</span><span class="val" id="out_ros">0 %</span></div>
           <div class="row"><span class="lbl">Точка безубыточности, покупателей</span><span class="val" id="out_bep_b">0</span></div>
           <div class="row"><span class="lbl">Безубыточная выручка</span><span class="val" id="out_bep_rev">0 ₽</span></div>
-          <div class="row"><span class="lbl">Запас прочности</span><span class="val" id="out_safety">0 %</span></div>
+          <div class="row"><span class="lbl">Запас прочности, ₽</span><span class="val" id="out_safety_rub">0 ₽</span></div>
+          <div class="row"><span class="lbl">Запас прочности, %</span><span class="val" id="out_safety">0 %</span></div>
         </div>
       </div>
     </main>
 
     <section class="card compare-card">
       <h2>6. Сравнение сценариев: План А vs План Б</h2>
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th>Показатель</th>
-            <th>План А</th>
-            <th>План Б</th>
-            <th>Разница (Б − А)</th>
-          </tr>
-        </thead>
-        <tbody id="compare_body"></tbody>
-      </table>
+      <div class="compare-layout">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Показатель</th>
+              <th>План А</th>
+              <th>План Б</th>
+              <th>Разница (Б − А)</th>
+            </tr>
+          </thead>
+          <tbody id="compare_body"></tbody>
+        </table>
+        <div class="compare-bars" id="compare_bars"></div>
+      </div>
     </section>
   </div>
   <script src="formulas.js"></script>
