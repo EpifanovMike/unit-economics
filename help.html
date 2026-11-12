@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Справка — Финансовая модель и Unit-экономика</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    html { scroll-behavior: smooth; }
+    .help-wrapper { max-width: 1020px; margin: 0 auto; padding-bottom: 50px; }
+    .help-section { margin-bottom: 14px; scroll-margin-top: 16px; }
+    
+    /* Заголовок секции с кнопкой возврата к содержанию */
+    .sec-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f1f5f9; }
+    .sec-head h2 { margin: 0 !important; padding: 0 !important; border: none !important; font-size: 15px; }
+    .back-toc { font-size: 11.5px; color: #2563eb; text-decoration: none; font-weight: 600; background: #eff6ff; padding: 3px 8px; border-radius: 5px; white-space: nowrap; transition: background 0.15s; }
+    .back-toc:hover { background: #dbeafe; }
+
+    /* Оглавление */
+    .toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; margin-top: 6px; }
+    .toc-link { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; color: #1e293b; text-decoration: none; font-weight: 600; font-size: 12.5px; transition: all 0.15s; }
+    .toc-link:hover { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+
+    /* Текстовые элементы и списки */
+    .help-list { padding-left: 18px; line-height: 1.55; color: #334155; }
+    .help-list li { margin-bottom: 6px; }
+    .help-list li strong { color: #0f172a; }
+    .help-p { line-height: 1.55; color: #334155; margin-bottom: 8px; }
+    
+    /* Шаги инструкции */
+    .step-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 11px 14px; margin-bottom: 10px; }
+    .step-box:last-child { margin-bottom: 0; }
+    .step-title { font-weight: 700; color: #0f172a; font-size: 13.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .badge-step { background: #2563eb; color: #fff; font-size: 11px; padding: 2px 7px; border-radius: 4px; }
+    code { background: #e2e8f0; color: #0f172a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; font-weight: 600; }
+
+    /* Карточки ошибок */
+    .err-item { border-left: 3px solid #dc2626; background: #fef2f2; padding: 10px 12px; border-radius: 0 6px 6px 0; margin-bottom: 10px; }
+    .err-item:last-child { margin-bottom: 0; }
+    .err-title { font-weight: 700; color: #991b1b; margin-bottom: 4px; font-size: 13px; }
+    .err-fix { margin-top: 5px; padding-top: 5px; border-top: 1px dashed #fecaca; color: #166534; font-weight: 500; }
+
+    /* Аккордеон FAQ */
+    details.faq-item { border: 1px solid #e2e8f0; border-radius: 7px; margin-bottom: 8px; background: #f8fafc; overflow: hidden; }
+    details.faq-item:last-child { margin-bottom: 0; }
+    details.faq-item summary { padding: 9px 12px; font-weight: 700; color: #0f172a; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+    details.faq-item summary::-webkit-details-marker { display: none; }
+    details.faq-item summary::after { content: '+'; font-size: 16px; color: #2563eb; font-weight: 700; }
+    details.faq-item[open] summary::after { content: '−'; }
+    details.faq-item[open] summary { background: #eff6ff; color: #1d4ed8; border-bottom: 1px solid #dbeafe; }
+    .faq-body { padding: 10px 12px; background: #fff; line-height: 1.5; color: #334155; }
+
+    /* Плавающая кнопка к содержанию */
+    .floating-toc { position: fixed; bottom: 20px; right: 20px; background: #2563eb; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 20px; font-weight: 600; font-size: 12.5px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35); z-index: 999; transition: background 0.15s; }
+    .floating-toc:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+  <div class="container help-wrapper">
+    
+    <!-- Верхняя панель навигации -->
+    <header class="topbar">
+      <div class="title-group">
+        <h1>📊 Справка: Финансовая модель и Unit-экономика</h1>
+      </div>
+      <div class="controls">
+        <a href="index.html" style="text-decoration: none;">
+          <button type="button" class="primary">← Вернуться в калькулятор</button>
+        </a>
+      </div>
+    </header>
+
+    <!-- Блок Содержания -->
+    <section id="toc" class="card help-section">
+      <h2>📑 Содержание справочника</h2>
+      <p class="help-p">Выберите нужный раздел для быстрого перехода к инструкции, расшифровке метрик или разбору ошибок:</p>
+      <div class="toc-grid">
+        <a href="#who-needs" class="toc-link">🎯 1. Кому нужен калькулятор</a>
+        <a href="#what-for" class="toc-link">💡 2. Для чего он нужен</a>
+        <a href="#how-to-use" class="toc-link">🛠 3. Пошаговая инструкция</a>
+        <a href="#metrics" class="toc-link">📖 4. Справочник метрик</a>
+        <a href="#mistakes" class="toc-link">⚠️ 5. Типичные ошибки</a>
+        <a href="#faq" class="toc-link">❓ 6. Частые вопросы (FAQ)</a>
+      </div>
+    </section>
+
+    <!-- 1. Кому нужен калькулятор -->
+    <section id="who-needs" class="card help-section">
+      <div class="sec-head">
+        <h2>🎯 1. Кому нужен калькулятор</h2>
+        <a href="#toc" class="back-toc">↑ К содержанию</a>
+      </div>
+      <ul class="help-list">
+        <li><strong>Начинающим предпринимателям и стартапам</strong> — для быстрой проверки бизнес-идеи до вложения основных средств и запуска проекта.</li>
+        <li><strong>Владельцам малого и среднего бизнеса</strong> — для контроля чистой прибыли, выявления лишних издержек и планирования масштабирования.</li>
+        <li><strong>Маркетологам и трафик-менеджерам</strong> — для расчета предельно допустимой стоимости привлечения клиента (<code>CAC</code>) и оценки окупаемости рекламы (<code>ROMI</code>).</li>
+        <li><strong>Продуктовым менеджерам (Product Managers)</strong> — для прогнозирования того, как изменение конверсии, среднего чека или частоты покупок повлияет на итоговую выручку.</li>
+      </ul>
+    </section>
+
+    <!-- 2. Для чего он нужен -->
+    <section id="what-for" class="card help-section">
+      <div class="sec-head">
+        <h2>💡 2. Для чего он нужен</h2>
+        <a href="#toc" class="back-toc">↑ К содержанию</a>
+      </div>
+      <ul class="help-list">
+        <li><strong>Оценка реальной рентабельности.</strong> Показывает, сколько чистых денег остается у бизнеса после уплаты себестоимости, аренды, зарплат и налогов.</li>
+        <li><strong>Поиск точки безубыточности (BEP).</strong> Рассчитывает минимальное количество клиентов и объем выручки, необходимые для выхода в «ноль».</li>
+        <li><strong>Тестирование гипотез («Что, если...»).</strong> Позволяет сравнить базовый сценарий (План А) с альтернативным (План Б) — например, узнать, как изменится прибыль при росте среднего чека на 10%.</li>
+        <li><strong>Визуализация структуры расходов.</strong> Наглядная шкала в верхней части калькулятора демонстрирует, какую долю выручки «съедают» себестоимость, маркетинг, налоги и постоянные расходы.</li>
+      </ul>
+    </section>
+    <!-- 3. Пошаговая инструкция -->
+    <section id="how-to-use" class="card help-section">
+      <div class="sec-head">
+        <h2>🛠 3. Как работать с калькулятором (пошаговая инструкция)</h2>
+        <a href="#toc" class="back-toc">↑ К содержанию</a>
+      </div>
+      
+      <div class="alert" style="display: block; margin-top: 0; margin-bottom: 12px;">
+        <strong>Важно:</strong> Вводите свои данные <strong>только в поля с белой/светлой заливкой и рамкой</strong>. Все остальные ячейки (на сером и зеленом фоне) пересчитываются автоматически.
+      </div>
+
+      <div class="step-box">
+        <div class="step-title"><span class="badge-step">Шаг 1</span> Настройка верхней панели</div>
+        <ul class="help-list" style="margin-bottom: 0;">
+          <li><strong>Налоговый режим:</strong> В выпадающем списке слева выберите вашу систему налогообложения (например, <em>«УСН 6% (Доходы)»</em>). Ставки налогов подставятся в расчет автоматически.</li>
+          <li><strong>Управление данными:</strong> Нажмите <code>Демо-данные</code>, чтобы изучить работу модели на тестовом примере, или <code>Очистить</code>, чтобы сбросить все значения и начать ввод с нуля.</li>
+        </ul>
+      </div>
+
+      <div class="step-box">
+        <div class="step-title"><span class="badge-step">Шаг 2</span> Заполнение исходных данных</div>
+        <ul class="help-list" style="margin-bottom: 0;">
+          <li><strong>Блок «1. Юнит-экономика и трафик»:</strong> Укажите <code>Привлеченные пользователи (UA)</code>, <code>Конверсию в покупку (C1, %)</code>, <code>Средний чек (AVP)</code>, <code>Долю себестоимости (COGS, %)</code>, а также <code>Покупок на клиента (APC)</code> и <code>Время жизни клиента (Lifetime)</code>.</li>
+          <li><strong>Блок «2. Операционные допущения»:</strong> Впишите <code>Площадь аренды (м²)</code>, <code>Ставку аренды за м²</code> и стоимость <code>Расходных материалов на 1 покупку</code> (упаковка, пакеты, расходники).</li>
+          <li><strong>Блок «3. Отчет о прибылях и убытках (P&amp;L)»:</strong> Заполните <code>Расходы на маркетинг (AC)</code>, <code>Коммерческие расходы (SC)</code> и зарплату <code>Административного персонала (Admin OPEX)</code>.</li>
+        </ul>
+      </div>
+
+      <div class="step-box">
+        <div class="step-title"><span class="badge-step">Шаг 3</span> Анализ результатов</div>
+        <ul class="help-list" style="margin-bottom: 0;">
+          <li><strong>Верхние карточки и низ Блока 3:</strong> Показывают итоговую <strong>Чистую прибыль</strong>, рентабельность продаж (<strong>ROS</strong>) и окупаемость вложений (<strong>ROI</strong>).</li>
+          <li><strong>Блок «4. Эффективность маркетинга и ROI»:</strong> Показывает стоимость привлечения покупателя (<strong>CAC</strong>) и пожизненную ценность клиента (<strong>LTV</strong>). Нормой для здорового бизнеса считается соотношение <code>LTV / CAC &gt; 3</code>.</li>
+          <li><strong>Блок «5. Рентабельность и безубыточность»:</strong> Отображает <strong>Точку безубыточности (BEP)</strong> в клиентах и деньгах, а также <strong>Запас прочности</strong> бизнеса.</li>
+        </ul>
+      </div>
+
+      <div class="step-box">
+        <div class="step-title"><span class="badge-step">Шаг 4</span> Сравнение сценариев и экспорт</div>
+        <ul class="help-list" style="margin-bottom: 0;">
+          <li><strong>A/B-моделирование:</strong> Нажмите <code>Копировать А → Б</code>, переключитесь на вкладку <strong>«План Б (Альтернативный)»</strong> в шапке калькулятора и измените ключевые метрики, чтобы найти точки роста.</li>
+          <li><strong>Выгрузка отчета:</strong> Сохраните готовую финансовую модель для работы в таблицах кнопкой <code>Excel (.xlsx)</code> или сформируйте документ для печати через <code>Печать / PDF</code>.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4. Справочник метрик -->
+    <section id="metrics" class="card help-section">
+      <div class="sec-head">
+        <h2>📖 4. Справочник ключевых метрик</h2>
+        <a href="#toc" class="back-toc">↑ К содержанию</a>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th style="width: 110px;">Метрика</th>
+              <th style="width: 240px; text-align: left;">Расшифровка</th>
+              <th style="text-align: left;">Что означает в расчетах</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>UA</code></td>
+              <td style="text-align: left;">User Acquisition</td>
+              <td style="text-align: left;">Количество привлеченных пользователей (входящий трафик).</td>
+            </tr>
+            <tr>
+              <td><code>C1</code></td>
+              <td style="text-align: left;">Conversion Rate</td>
+              <td style="text-align: left;">Конверсия из посетителя в первую покупку (%).</td>
+            </tr>
+            <tr>
+              <td><code>AVP</code></td>
+              <td style="text-align: left;">Average Value of Purchase</td>
+              <td style="text-align: left;">Средний чек одной покупки.</td>
+            </tr>
+            <tr>
+              <td><code>COGS</code></td>
+              <td style="text-align: left;">Cost of Goods Sold</td>
+              <td style="text-align: left;">Прямая себестоимость проданных товаров или услуг.</td>
+            </tr>
+            <tr>
+              <td><code>CAC</code></td>
+              <td style="text-align: left;">Customer Acquisition Cost</td>
+              <td style="text-align: left;">Стоимость привлечения одного реального платящего клиента.</td>
+            </tr>
+            <tr>
+              <td><code>LTV</code></td>
+              <td style="text-align: left;">Lifetime Value</td>
+              <td style="text-align: left;">Совокупная прибыль, которую приносит один клиент за все время работы с ним.</td>
+            </tr>
+            <tr>
+              <td><code>EBITDA</code></td>
+              <td style="text-align: left;">Earnings Before Interest, Taxes...</td>
+              <td style="text-align: left;">Операционная прибыль до вычета налогов, процентов и амортизации.</td>
+            </tr>
+            <tr>
+              <td><code>BEP</code></td>
+              <td style="text-align: left;">Break-Even Point</td>
+              <td style="text-align: left;">Точка безубыточности (объем выручки или клиентов для выхода в «ноль»).</td>
+            </tr>
+            <tr>
+              <td><code>ROS</code></td>
+              <td style="text-align: left;">Return on Sales</td>
+              <td style="text-align: left;">Рентабельность продаж (доля чистой прибыли в общей выручке).</td>
+            </tr>
+            <tr>
+              <td><code>ROI / ROMI</code></td>
+              <td style="text-align: left;">Return on (Marketing) Investment</td>
+              <td style="text-align: left;">Окупаемость общих или маркетинговых вложений.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <!-- 5. Типичные ошибки при расчетах -->
+    <section id="mistakes" class="card help-section">
+      <div class="sec-head">
+        <h2>⚠️ 5. Типичные ошибки при расчетах</h2>
+        <a href="#toc" class="back-toc">↑ К содержанию</a>
+      </div>
+      <p class="help-p">При первичном заполнении финансовой модели часто допускаются ошибки, которые завышают прибыль на экране, но приводят к убыткам в реальности:</p>
+
+      <div class="err-item">
+        <div class="err-title">1. Конверсия в покупку C1 = 100% (как в демо-примере)</div>
+        <div>Указание конверсии 100% означает, что абсолютно каждый посетитель совершает покупку. Из-за этого стоимость лида (<code>CPA</code>) приравнивается к стоимости покупателя (<code>CAC</code>), что искажает окупаемость рекламы.</div>
+        <div class="err-fix">✓ Как правильно: ставьте реалистичные значения для вашей ниши (например, 1%–3% для интернет-магазинов или 10%–25% для офлайн-точек).</div>
+      </div>
+
+      <div class="err-item">
+        <div class="err-title">2. Смешивание временных периодов</div>
+        <div>Трафик (<code>UA</code>) и рекламный бюджет (<code>AC</code>) вводятся за 1 неделю, а аренда и зарплаты (<code>Admin OPEX</code>) — за 1 месяц.</div>
+        <div class="err-fix">✓ Как правильно: приведите все показатели к единому расчетному периоду — оптимально считать модель ровно за 1 календарный месяц.</div>
+      </div>
+
+      <div class="err-item">
+        <div class="err-title">3. Двойной учет одних и тех же расходов</div>
+        <div>Затраты на упаковку или доставку одновременно закладываются в процент себестоимости (<code>COGS, %</code>) и дублируются в <em>«Расходных материалах»</em> или <em>«Коммерческих расходах (SC)»</em>.</div>
+        <div class="err-fix">✓ Как правильно: в <code>COGS</code> — только закупка/производство товара, в <code>Расходные материалы</code> — упаковка на 1 заказ, в <code>SC</code> — комиссии эквайринга, маркетплейсов и доставка.</div>
+      </div>
+
+      <div class="err-item">
+        <div class="err-title">4. Недоучет зарплаты маркетологов в рекламном бюджете</div>
+        <div>В поле <em>«Расходы на маркетинг (AC)»</em> вписывают только бюджет рекламных кабинетов, забывая про оплату услуг таргетолога или подрядчиков.</div>
+        <div class="err-fix">✓ Как правильно: суммируйте в поле <code>AC</code> прямой рекламный бюджет и расходы на специалистов по трафику.</div>
+      </div>
+
+      <div class="err-item">
+        <div class="err-title">5. Оптимистичный прогноз повторных покупок (APC и Lifetime)</div>
+        <div>На старте проекта закладывается 5 повторных покупок на клиента без реальной статистики удержания, из-за чего убыточная первая продажа маскируется высоким <code>LTV</code>.</div>
+        <div class="err-fix">✓ Как правильно: в «Плане А» всегда ставьте <code>APC = 1</code> и <code>Lifetime = 1</code>, чтобы проверить окупаемость с первой продажи, а повторные покупки тестируйте в «Плане Б».</div>
+      </div>
+    </section>
+
+    <!-- 6. Частые вопросы (FAQ) -->
+    <section id="faq" class="card help-section">
+      <div class="sec-head">
+        <h2>❓ 6. Частые вопросы (FAQ)</h2>
+        <a href="#toc" class="back-toc">↑ К содержанию</a>
+      </div>
+
+      <details class="faq-item">
+        <summary>1. Почему я не могу изменить цифры в некоторых полях?</summary>
+        <div class="faq-body">
+          В калькуляторе реализована защита от случайного удаления формул. Редактировать можно <strong>только ячейки со светлой заливкой и рамкой</strong> (вводные данные). Остальные поля рассчитываются автоматически.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>2. В чем разница между CPA и CAC в Блоке 4?</summary>
+        <div class="faq-body">
+          <strong>CPA</strong> — стоимость привлечения одного потенциального клиента (посетителя/лида). <strong>CAC</strong> — стоимость привлечения одного реального покупателя. Если конверсия (<code>C1</code>) ниже 100%, стоимость покупателя (<code>CAC</code>) всегда будет выше стоимости лида (<code>CPA</code>).
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>3. Какое соотношение LTV / CAC считается нормальным для бизнеса?</summary>
+        <div class="faq-body">
+          Ориентиром для здоровой бизнес-модели считается показатель <code>LTV / CAC &gt;= 3</code> (клиент приносит минимум в 3 раза больше прибыли, чем потрачено на его привлечение). Если показатель меньше <code>1</code> — бизнес работает в убыток на каждом клиенте.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>4. За какой период нужно вводить данные (день, месяц, год)?</summary>
+        <div class="faq-body">
+          Калькулятор универсален, но важно соблюдать <strong>единый временной горизонт</strong> для всех полей. Если трафик и реклама указаны за 1 месяц, то аренда, зарплаты и время жизни клиента также должны быть указаны за 1 месяц.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>5. Как учитывать расходы, если у меня онлайн-бизнес без офиса?</summary>
+        <div class="faq-body">
+          В <strong>Блоке 2 («Операционные допущения»)</strong> просто поставьте <code>0</code> в полях <em>«Площадь аренды»</em> и <em>«Ставка аренды»</em>. Если нет затрат на упаковку, также укажите <code>0</code> в поле <em>«Расходные материалы на 1 покупку»</em>.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>6. Сохранятся ли мои данные, если я закрою или обновлю страницу?</summary>
+        <div class="faq-body">
+          Чтобы не потерять расчеты при случайном обновлении вкладки, регулярно сохраняйте готовую модель на компьютер кнопкой <code>Excel (.xlsx)</code> или <code>Печать / PDF</code> на верхней панели калькулятора.
+        </div>
+      </details>
+    </section>
+
+    <!-- Нижняя навигация -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+      <a href="#toc" class="back-toc" style="padding: 7px 12px; font-size: 12.5px;">↑ Вернуться к содержанию</a>
+      <a href="index.html" style="text-decoration: none;">
+        <button type="button" class="primary">← Вернуться в калькулятор</button>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Плавающая кнопка к содержанию -->
+  <a href="#toc" class="floating-toc no-print">↑ К содержанию</a>
+</body>
+</html>
