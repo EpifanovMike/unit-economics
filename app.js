@@ -34,7 +34,7 @@ const TIPS = {
   out_pbfc: 'Прибыль до вычета постоянных расходов и налогов.',
   admin_cost: 'Постоянные расходы на административный персонал.',
   vat_rate: 'Ставка налога на добавленную стоимость (22% на ОСН, 0% на УСН).',
-  out_vat: 'Сумма НДС к уплате в бюджет (исходящий НДС с выручки за вычетом входящего НДС по себестоимости и материалам).',
+  out_vat: 'Сумма НДС к уплате в бюджет (исходящий НДС с выручки за вытом входящего НДС по себестоимости и материалам).',
   tax_rate: 'Ставка налога для выбранного режима (УСН 6%, УСН 15% или налог на прибыль 25% на ОСН).',
   out_rent: 'Стоимость аренды (Площадь × Ставка).',
   out_ebitda: 'Операционная прибыль до вычета налогов (ПБПР - Админ - Аренда).',
@@ -58,6 +58,7 @@ const TIPS = {
 
 let activePlan = 'A';
 let plansData = { A: { ...DEMO_A }, B: { ...DEMO_B } };
+let isInitialLoad = true;
 
 const fmtCur = n => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 }).format(n) + ' ₽';
 const fmtNum = n => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 }).format(n);
@@ -66,9 +67,16 @@ const fmtDiff = (n, fmtFn) => (n > 0 ? '+' : '') + fmtFn(n);
 
 function setTxt(id, text) {
   const el = document.getElementById(id);
-  if (el) el.innerText = text;
+  if (!el) return;
+  if (el.innerText !== text) {
+    el.innerText = text;
+    if (!isInitialLoad && id !== 'print_plan_label') {
+      el.classList.remove('value-updated');
+      void el.offsetWidth;
+      el.classList.add('value-updated');
+    }
+  }
 }
-
 function toggleNeg(id, isNeg) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -89,6 +97,7 @@ function initTooltips() {
     }
   });
 }
+
 function renderStructureBar(r) {
   const segments = [
     { name: 'Себестоимость', val: r.cogs, color: '#ef4444' },
@@ -229,7 +238,6 @@ function updateUI() {
   renderStructureBar(r);
   renderComparison(resA, resB);
 }
-
 function loadPlanToForm(planKey) {
   activePlan = planKey;
   document.querySelectorAll('.plan-tabs .tab').forEach(btn => {
@@ -242,6 +250,7 @@ function loadPlanToForm(planKey) {
   });
   updateUI();
 }
+
 function exportToExcel() {
   const resA = window.calculateModel(plansData.A);
   const resB = window.calculateModel(plansData.B);
@@ -330,6 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.removeItem('fin_model_plans_v2');
   }
   loadPlanToForm('A');
+  isInitialLoad = false;
 
   NUM_IDS.forEach(id => document.getElementById(id).addEventListener('input', updateUI));
 
