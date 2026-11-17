@@ -107,3 +107,17 @@ hr { border: none; border-top: 1px solid #e2e8f0; margin: 5px 0; }
   .compare-table th, .compare-table td { padding: 2.5px 6px; font-size: 10px; }
   .compare-bars { padding: 8px; gap: 8px; }
 }
+
+@keyframes valueFlash {
+  0% {
+    background-color: #fef08a; /* Мягкий желтый акцент */
+    border-radius: 4px;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.value-updated {
+  animation: valueFlash 0.8s ease-out;
+}
