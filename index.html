@@ -6,7 +6,7 @@
   <title>Финансовая модель и Unit-экономика</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
-  <!-- Применяем тему до отрисовки -->
+  <!-- Применяем сохранённую тему до отрисовки -->
   <script>
     (function () {
       try {
@@ -36,8 +36,15 @@
         </button>
         <select id="tax_mode">
           <option value="usn6">УСН 6% (Доходы)</option>
-          <option value="usn15">УСН 15% (Доходы - Расходы)</option>
-          <option value="osn">ОСН (НДС 22% + Прибыль 25%)</option>
+          <option value="usn15">УСН 15% (Доходы − Расходы)</option>
+          <option value="usn6_vat5">УСН 6% + НДС 5% (с оборота)</option>
+          <option value="usn6_vat7">УСН 6% + НДС 7% (с оборота)</option>
+          <option value="osn">ОСНО (НДС 22% + Прибыль 25%)</option>
+          <option value="psn">ПСН (Патент)</option>
+          <option value="npd">НПД (Самозанятые)</option>
+          <option value="ausn_d">АУСН 8% (Доходы)</option>
+          <option value="ausn_dr">АУСН 20% (Доходы − Расходы)</option>
+          <option value="eshn">ЕСХН 6% (Доходы − Расходы)</option>
         </select>
         <button id="btn-demo">Демо-данные</button>
         <button id="btn-clear">Очистить</button>
@@ -116,9 +123,14 @@
           <div class="row"><label for="admin_cost">Административный персонал / Admin OPEX, ₽</label><input type="number" id="admin_cost" min="0" step="500" autocomplete="off"></div>
           <div class="row"><span class="lbl">Аренда помещения / Rent OPEX</span><span class="val" id="out_rent">0 ₽</span></div>
           <div class="row"><span class="lbl">Операционная прибыль / EBITDA</span><span class="val" id="out_ebitda">0 ₽</span></div>
-          <div class="row"><label for="vat_rate">Ставка НДС / VAT Rate, %</label><input type="number" id="vat_rate" min="0" max="100" step="1" autocomplete="off"></div>
-          <div class="row"><span class="lbl">НДС к уплате / VAT Payable</span><span class="val" id="out_vat">0 ₽</span></div>
-          <div class="row"><label for="tax_rate">Ставка налога / Tax Rate, %</label><input type="number" id="tax_rate" min="0" max="100" step="0.5" autocomplete="off"></div>
+          
+          <!-- Блок налогов: поля скрываются/показываются через JS -->
+          <div class="row" id="row_vat_rate"><label for="vat_rate">Ставка НДС / VAT Rate, %</label><input type="number" id="vat_rate" min="0" max="100" step="1" autocomplete="off"></div>
+          <div class="row" id="row_vat_payable"><span class="lbl">НДС к уплате / VAT Payable</span><span class="val" id="out_vat">0 ₽</span></div>
+          
+          <div class="row" id="row_tax_rate"><label for="tax_rate">Ставка налога / Tax Rate, %</label><input type="number" id="tax_rate" min="0" max="100" step="0.5" autocomplete="off"></div>
+          <div class="row" id="row_patent_cost" style="display: none;"><label for="patent_cost">Стоимость патента / мес., ₽</label><input type="number" id="patent_cost" min="0" step="1000" autocomplete="off"></div>
+          
           <div class="row"><span class="lbl">Налоги (итого) / Total Taxes</span><span class="val" id="out_taxes">0 ₽</span></div>
           <div class="row highlight total"><span class="lbl">ЧИСТАЯ ПРИБЫЛЬ / Net Profit</span><span class="val" id="out_net">0 ₽</span></div>
         </div>
