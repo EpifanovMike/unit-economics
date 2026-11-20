@@ -1,15 +1,15 @@
-const NUM_IDS = ['ua', 'c1', 'avp', 'cogs_m', 'apc', 'lifetime', 'area', 'rent_price', 'mat_price', 'ac', 'sc', 'admin_cost', 'vat_rate', 'tax_rate'];
-const STORAGE_KEY = 'fin_model_plans_v2';
+const NUM_IDS = ['ua', 'c1', 'avp', 'cogs_m', 'apc', 'lifetime', 'area', 'rent_price', 'mat_price', 'ac', 'sc', 'admin_cost', 'vat_rate', 'tax_rate', 'patent_cost'];
+const STORAGE_KEY = 'fin_model_plans_v3';
 const THEME_KEY = 'unit_econ_theme';
 
 const DEMO_A = {
   tax_mode: 'usn6', ua: 2500, c1: 100, avp: 3500, cogs_m: 45, apc: 1, lifetime: 1,
-  area: 25, rent_price: 1000, mat_price: 20, ac: 180000, sc: 0, admin_cost: 20000, vat_rate: 0, tax_rate: 6
+  area: 25, rent_price: 1000, mat_price: 20, ac: 180000, sc: 0, admin_cost: 20000, vat_rate: 0, tax_rate: 6, patent_cost: 50000
 };
 
 const DEMO_B = {
   tax_mode: 'usn6', ua: 4000, c1: 85, avp: 3900, cogs_m: 42, apc: 1.2, lifetime: 2,
-  area: 25, rent_price: 1000, mat_price: 20, ac: 320000, sc: 50000, admin_cost: 35000, vat_rate: 0, tax_rate: 6
+  area: 25, rent_price: 1000, mat_price: 20, ac: 320000, sc: 50000, admin_cost: 35000, vat_rate: 0, tax_rate: 6, patent_cost: 50000
 };
 
 const TIPS = {
@@ -35,9 +35,10 @@ const TIPS = {
   out_var: 'Суммарные затраты на расходные материалы и упаковку.',
   out_pbfc: 'Прибыль до вычета постоянных расходов и налогов.',
   admin_cost: 'Постоянные расходы на административный персонал.',
-  vat_rate: 'Ставка налога на добавленную стоимость (22% на ОСН, 0% на УСН).',
-  out_vat: 'Сумма НДС к уплате в бюджет (исходящий НДС с выручки за вытом входящего НДС по себестоимости и материалам).',
-  tax_rate: 'Ставка налога для выбранного режима (УСН 6%, УСН 15% или налог на прибыль 25% на ОСН).',
+  vat_rate: 'Ставка налога на добавленную стоимость (зависит от режима).',
+  out_vat: 'Сумма НДС к уплате в бюджет.',
+  tax_rate: 'Ставка налога для выбранного режима.',
+  patent_cost: 'Стоимость патента (ПСН) за месяц, вычитается из прибыли.',
   out_rent: 'Стоимость аренды (Площадь × Ставка).',
   out_ebitda: 'Операционная прибыль до вычета налогов (ПБПР - Админ - Аренда).',
   out_taxes: 'Итоговая сумма налогов к уплате по выбранному режиму.',
@@ -143,6 +144,46 @@ function initTheme() {
   }
 }
 
+/* ---------- Управление видимостью налоговых полей ---------- */
+function toggleTaxFields() {
+  const mode = document.getElementById('tax_mode').value;
+  
+  // По умолчанию показываем все, потом скрываем ненужные
+  const rowVatRate = document.getElementById('row_vat_rate');
+  const rowVatPayable = document.getElementById('row_vat_payable');
+  const rowTaxRate = document.getElementById('row_tax_rate');
+  const rowPatentCost = document.getElementById('row_patent_cost');
+
+  if (!rowVatRate) return; // защита, если DOM еще не готов
+
+  rowVatRate.style.display = 'flex';
+  rowVatPayable.style.display = 'flex';
+  rowTaxRate.style.display = 'flex';
+  rowPatentCost.style.display = 'none';
+
+  if (mode === 'psn') {
+    rowVatRate.style.display = 'none';
+    rowVatPayable.style.display = 'none';
+    rowTaxRate.style.display = 'none';
+    rowPatentCost.style.display = 'flex';
+  } 
+  else if (['npd', 'ausn_d', 'ausn_dr', 'eshn'].includes(mode)) {
+    rowVatRate.style.display = 'none';
+    rowVatPayable.style.display = 'none';
+    rowTaxRate.style.display = 'none';
+  }
+  else if (mode === 'usn6_vat5' || mode === 'usn6_vat7' || mode === 'osn') {
+    // Ставки фиксированы в формулах, поля ввода скрываем
+    rowVatRate.style.display = 'none';
+    rowTaxRate.style.display = 'none';
+  }
+  else if (mode === 'usn6' || mode === 'usn15') {
+    // Для классических УСН показываем ставку налога (можно изменить на региональную), НДС скрываем
+    rowVatRate.style.display = 'none';
+    rowVatPayable.style.display = 'none';
+  }
+}
+
 /* ---------- Рендеринг ---------- */
 function renderStructureBar(r) {
   const segments = [
@@ -218,7 +259,9 @@ function renderComparison(resA, resB) {
 function readForm() {
   const v = { tax_mode: document.getElementById('tax_mode').value };
   NUM_IDS.forEach(id => {
-    const val = parseFloat(document.getElementById(id).value);
+    const el = document.getElementById(id);
+    if (!el) return;
+    const val = parseFloat(el.value);
     v[id] = (isNaN(val) || val < 0) ? 0 : val;
   });
   return v;
@@ -281,6 +324,7 @@ function updateUI() {
   setTxt('out_safety_rub', r.bep_reachable ? fmtCur(r.safety_rub) : '0 ₽');
   setTxt('out_safety', r.bep_reachable ? fmtPct(r.safety) : '0 %');
 
+  toggleTaxFields();
   renderStructureBar(r);
   renderComparison(resA, resB);
 }
@@ -293,7 +337,8 @@ function loadPlanToForm(planKey) {
   const data = plansData[planKey];
   document.getElementById('tax_mode').value = data.tax_mode || 'usn6';
   NUM_IDS.forEach(id => {
-    document.getElementById(id).value = data[id] !== undefined ? data[id] : 0;
+    const el = document.getElementById(id);
+    if (el) el.value = data[id] !== undefined ? data[id] : 0;
   });
   updateUI();
 }
@@ -311,6 +356,7 @@ function exportToExcel() {
   // 1. Лист Сравнение
   const compRows = [
     ['Показатель', 'План А', 'План Б', 'Разница (Б - А)'],
+    ['Налоговый режим', plansData.A.tax_mode, plansData.B.tax_mode, ''],
     ['Привлеченные пользователи (UA)', plansData.A.ua, plansData.B.ua, plansData.B.ua - plansData.A.ua],
     ['Конверсия C1 (%)', plansData.A.c1, plansData.B.c1, +(plansData.B.c1 - plansData.A.c1).toFixed(2)],
     ['Покупатели (чел.)', resA.b, resB.b, resB.b - resA.b],
@@ -325,7 +371,7 @@ function exportToExcel() {
     ['Аренда (₽)', resA.rent, resB.rent, resB.rent - resA.rent],
     ['EBITDA (₽)', resA.ebitda, resB.ebitda, resB.ebitda - resA.ebitda],
     ['НДС к уплате (₽)', resA.vat, resB.vat, resB.vat - resA.vat],
-    ['Налоги (₽)', resA.taxes, resB.taxes, resB.taxes - resA.taxes],
+    ['Налоги (итого) (₽)', resA.taxes, resB.taxes, resB.taxes - resA.taxes],
     ['ЧИСТАЯ ПРИБЫЛЬ (₽)', resA.net, resB.net, resB.net - resA.net],
     ['Рентабельность ROS (%)', +resA.ros.toFixed(2), +resB.ros.toFixed(2), +(resB.ros - resA.ros).toFixed(2)],
     ['Полный ROI (%)', +resA.roi.toFixed(2), +resB.roi.toFixed(2), +(resB.roi - resA.roi).toFixed(2)],
@@ -361,7 +407,7 @@ function exportToExcel() {
     ['Аренда (Rent)', +resA.rent.toFixed(2)],
     ['EBITDA', +resA.ebitda.toFixed(2)],
     ['НДС', +resA.vat.toFixed(2)],
-    ['Налог', +(resA.taxes - resA.vat).toFixed(2)],
+    ['Налог (итого)', +resA.taxes.toFixed(2)],
     ['ЧИСТАЯ ПРИБЫЛЬ', +resA.net.toFixed(2)]
   ];
 
@@ -381,7 +427,7 @@ function exportToExcel() {
     ['Аренда (Rent)', +resB.rent.toFixed(2)],
     ['EBITDA', +resB.ebitda.toFixed(2)],
     ['НДС', +resB.vat.toFixed(2)],
-    ['Налог', +(resB.taxes - resB.vat).toFixed(2)],
+    ['Налог (итого)', +resB.taxes.toFixed(2)],
     ['ЧИСТАЯ ПРИБЫЛЬ', +resB.net.toFixed(2)]
   ];
 
@@ -421,17 +467,12 @@ document.addEventListener('DOMContentLoaded', () => {
   loadPlanToForm('A');
   isInitialLoad = false;
 
-  NUM_IDS.forEach(id => document.getElementById(id).addEventListener('input', updateUI));
+  NUM_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateUI);
+  });
 
-  document.getElementById('tax_mode').addEventListener('change', (e) => {
-    const presets = {
-      usn6: { vat: 0, tax: 6 },
-      usn15: { vat: 0, tax: 15 },
-      osn: { vat: 22, tax: 25 }
-    };
-    const cfg = presets[e.target.value] || presets.usn6;
-    document.getElementById('vat_rate').value = cfg.vat;
-    document.getElementById('tax_rate').value = cfg.tax;
+  document.getElementById('tax_mode').addEventListener('change', () => {
     updateUI();
   });
 
